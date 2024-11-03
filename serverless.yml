@@ -1,0 +1,55 @@
+service: starwars-post
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+  apiGateway:
+    minimumCompressionSize: 1024  
+    shouldStartNameWithService: true
+    restApiId: s2ruc0eydf
+    restApiRootResourceId: r4o5ayoscc
+
+functions:
+  api:
+    handler: dist/lambda.handler 
+    timeout: 30 
+    layers:
+      - arn:aws:lambda:us-east-1:891612572270:layer:mongoose-layer:2  # Verifica que el ARN sea correcto
+    events:
+      - http:
+          path: /film-post
+          method: GET
+      - http:
+          path: /film-post
+          method: POST
+      - http:
+          path: /film-post/{id}
+          method: GET
+
+package:
+  individually: true
+  excludeDevDependencies: true  # Excluye dependencias de desarrollo
+  exclude:
+    - node_modules/**
+    - dist/test/**                # Si tienes archivos de pruebas u otros no esenciales
+    - src/**                      # Excluye el código fuente si no es necesario
+    - test/**                     # Excluye carpetas de pruebas
+    - layers/**
+
+custom:
+  bundle:
+    externalModules:
+      - mongoose
+      - "@nestjs/mongoose"
+      - "@nestjs/common"
+      - "@nestjs/core"
+      - "@nestjs/platform-express"
+      - "aws-lambda"
+      - "aws-serverless-express"
+      - "class-validator"
+      - "reflect-metadata"
+      - "rxjs"
+
+plugins:
+  - serverless-offline
